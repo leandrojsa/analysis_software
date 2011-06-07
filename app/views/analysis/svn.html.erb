@@ -1,0 +1,6 @@
+<% @doc.css("logentry paths").each{ |p| %>
+        <% p.css("path").each{|pp| %>
+          <p><%= pp['action'] %> - <%= pp.text %></p>
+        <% } %>
+      <% } %>
+

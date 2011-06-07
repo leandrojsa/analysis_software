@@ -3,8 +3,9 @@
 <p><b>Aluno:</b> Leandro José Silva Andrade</p>
 <p><b>Orientador:</b> Cláudio Sant'anna</p>
 
-<% form_tag '/analysis/svn' do %>
+<%= form_tag '/analysis/svn' do %>
 <p><b>URL repositório:</b> <%=text_field_tag "url" %></p>
+<p><b>Extensão dos arquivos:</b> <%=text_field_tag "extension" %></p>
 <%= submit_tag "Analisar" %>
 <% end %>
 
