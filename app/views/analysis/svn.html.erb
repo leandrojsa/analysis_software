@@ -1,3 +1,19 @@
+<table>
+  <thead>
+    <th>Files</th>
+    <th>Number of commits</th>
+  </thead>
+  <tbody>
+    <% @hash_files.each_key do |file_key| %>
+      <tr>
+        <td><%= file_key %></td>
+        <td><%= @hash_files[file_key] %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<br/>
+<br/>
 <% @doc.css("logentry paths").each{ |p| %>
         <% p.css("path").each{|pp| %>
           <p><%= pp['action'] %> - <%= pp.text %></p>
