@@ -1,3 +1,4 @@
+<p><b>Total number of commits: </b><%= @num_revisions%></p>
 <table>
   <thead>
     <th>Files</th>
@@ -14,9 +15,4 @@
 </table>
 <br/>
 <br/>
-<% @doc.css("logentry paths").each{ |p| %>
-        <% p.css("path").each{|pp| %>
-          <p><%= pp['action'] %> - <%= pp.text %></p>
-        <% } %>
-      <% } %>
 

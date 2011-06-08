@@ -7,8 +7,11 @@ class AnalysisController < ApplicationController
       flash[:notice] = "Preencha todos os campos."
     else
       #system("svn log -v --xml --incremental " + params[:url] + " > exit.xml" )
-      @doc = Nokogiri::XML(File.open("exit.xml"))
+      @extension = params[:extension].gsub(/ /, '').split ','
 
+      file = File.open("exit.xml")
+      @doc = Nokogiri::XML(file)
+      file.close
       @num_revisions = 0
       @hash_files = Hash.new
       @doc.css("logentry").each{ |logentry|
@@ -20,11 +23,13 @@ class AnalysisController < ApplicationController
               file_path = path["copyfrom-path"]
             end
             file_path += path.text
-            if @hash_files[file_path].nil?
-              @hash_files[file_path] = 1
-            else
-              @hash_files[file_path] += 1
-            end
+              if has_file_type @extension, file_path
+                if @hash_files[file_path].nil?
+                  @hash_files[file_path] = 1
+                else
+                  @hash_files[file_path] += 1
+                end
+              end
 
           }
 
@@ -32,6 +37,15 @@ class AnalysisController < ApplicationController
 
       }
     end
+  end
+
+  def has_file_type types, file
+    types.each{|type|
+      if file.include?(type)
+        return true
+      end
+    }
+    return false
   end
 
 end
