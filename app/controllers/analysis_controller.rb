@@ -6,10 +6,10 @@ class AnalysisController < ApplicationController
     if params[:url].nil? and params[:extension].nil?
       flash[:notice] = "Preencha todos os campos."
     else
-      #system("svn log -v --xml --incremental " + params[:url] + " > exit.xml" )
+      system("svn log -v --xml --incremental " + params[:url] + "| sed '1i\<root>' | sed '$a\</root>' > exit2.xml" )
       @extension = params[:extension].gsub(/ /, '').split ','
 
-      file = File.open("exit.xml")
+      file = File.open("exit2.xml")
       @doc = Nokogiri::XML(file)
       file.close
       @num_revisions = 0
@@ -41,7 +41,8 @@ class AnalysisController < ApplicationController
 
   def has_file_type types, file
     types.each{|type|
-      if file.include?(type)
+      rexp = Regexp.new(type + '$')
+      if !file.match(rexp).nil?
         return true
       end
     }
