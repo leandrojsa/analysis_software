@@ -16,3 +16,28 @@
 <br/>
 <br/>
 
+<table border="1">
+    <tr>
+    <td></td>
+    <% i= 1 %>
+    <% @hash_files.each_key do |file_key| %>
+      <td><a href="#" title="<%= file_key %>"><%= i %></a></td>
+      <% i += 1 %>
+    <% end %>
+    </tr>
+    <% j= 1%>
+    <% @hash_files.each_key do |file_key1| %>
+      <tr>
+      <td><a href="#" title="<%= file_key1 %>"><%= j %></a></td>
+      <% j +=1 %>
+      <% @hash_files.each_key do |file_key| %>
+        <% if !@matrix_dependence[file_key1 + ',' + file_key].nil? %>
+          <td><%= @matrix_dependence[file_key1 + ',' + file_key] %></td>
+        <% else %>
+          <td>0</td>
+        <% end %>
+      <% end %>
+      </tr>
+    <% end %>
+</table>
+
