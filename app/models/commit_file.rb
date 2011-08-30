@@ -1,5 +1,5 @@
 class CommitFile < ActiveRecord::Base
 
-    belongs_to :file
+    belongs_to :p_file
     belongs_to :commit
 end

@@ -10,11 +10,11 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110830181833) do
+ActiveRecord::Schema.define(:version => 20110830192204) do
 
   create_table "commit_files", :force => true do |t|
-    t.string   "type",       :limit => 1
-    t.integer  "file_id"
+    t.string   "action_type", :limit => 1
+    t.integer  "p_file_id"
     t.integer  "commit_id"
     t.datetime "created_at"
     t.datetime "updated_at"
