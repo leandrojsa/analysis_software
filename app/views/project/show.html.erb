@@ -1,0 +1,59 @@
+<script type="text/javascript"> 
+			
+$(document).ready( function() {
+	
+	$('#files-tree').fileTree();
+}
+				
+</script>
+
+
+<h1><%= @project.name %></h1>
+<p>Total commits: <%= @commits.count %></p>
+<div id="cloud-tags" style = "width: 600px;">
+    <h2>Cloud Tags</h2>
+    <ul>
+    <% @tags.each_key do |tag| %>
+        <% if (@tags[tag] - @count_min_word).to_f / (@count_max_word - @count_min_word).to_f > 0.30 %>
+            <li style="font-size: <%= (50 * (@tags[tag] - @count_min_word)) / (@count_max_word - @count_min_word) %>px;"><%= tag %>(<%= @tags[tag] %>)</li>
+        <% end %>
+    <% end %>
+    </ul>
+</div>
+
+<div id="files-tree" style = "clear: both;">
+<% levels = ['']%>
+<% for p_file in @p_files %>
+    <% p_file.path_name = p_file.path_name.split '/' %>
+    <% if p_file.path_name.include? levels.last %>        
+        <ul class="jqueryFileTree">
+        <% levels.push p_file.path_name.last %>
+    <% else %>
+        <% if !p_file.path_name.include? levels[-2] %>        
+            </ul>
+            <% levels.pop %>
+        <% end %>
+        <% levels.pop %>
+        <% levels.push p_file.path_name.last %>
+    <% end %>
+    <li><%= p_file.path_name.last %></li>
+    
+<% end %>
+</ul>
+</ul>
+</div>
+
+<% @coevolution_files.each_key do |file_key| %>
+    <h3><%= file_key.path_name %></h3>
+    <table>
+        <% @coevolution_files[file_key].each_key do |co_file_key| %>
+            <tr>
+                <td><%= co_file_key.path_name %></td>
+                <td><%= @coevolution_files[file_key][co_file_key] %></td>
+                
+            </tr>
+        <% end %>
+    </table>
+    <br />
+    <br />
+<% end %>

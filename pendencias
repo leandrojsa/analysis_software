@@ -1,1 +1,5 @@
 + validacoes no model
+
++ existem arquivos que tiveram somente 1 commit logo são apresentados 100% acoplado com os demais desse commit
+
++ Retirar caracteres sujos da nuvem de tags e palavras sem significância
