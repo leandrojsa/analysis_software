@@ -1,6 +1,39 @@
 class ProjectController < ApplicationController
 
 
+    def coevolution
+        if params[:files]
+            @p_files = Array.new  
+            for p_files_id in params[:files]
+                @p_files.push PFile.find p_files_id
+            end
+            @coevolution_files = Hash.new
+            total_commits_files = 0
+            @p_files.each{|file| 
+                total_commits_files += file.commit_files.count
+                for commit_file in file.commit_files
+                    for co_file in commit_file.commit.commit_files
+                        if co_file.p_file_id != file.id
+                            if @coevolution_files[co_file.p_file].nil?
+                                @coevolution_files.store co_file.p_file, 1
+                            else
+                                @coevolution_files[co_file.p_file] += 1 
+                            end
+                        end
+                    end 
+                end
+                
+            } 
+            @coevolution_files.each_key{|file_key|
+                @coevolution_files[file_key] = @coevolution_files[file_key].to_f / total_commits_files.to_f
+            
+            
+            }
+
+        end
+    end
+
+
     def show
         
         if params[:id]

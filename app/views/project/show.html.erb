@@ -1,9 +1,12 @@
 <script type="text/javascript"> 
 			
 $(document).ready( function() {
+                                                                                    
+$("#browser").treeview({
+    collapsed: true,
+});
 	
-	$('#files-tree').fileTree();
-}
+});
 				
 </script>
 
@@ -21,27 +24,68 @@ $(document).ready( function() {
     </ul>
 </div>
 
+
+
+
+
 <div id="files-tree" style = "clear: both;">
-<% levels = ['']%>
-<% for p_file in @p_files %>
-    <% p_file.path_name = p_file.path_name.split '/' %>
-    <% if p_file.path_name.include? levels.last %>        
-        <ul class="jqueryFileTree">
-        <% levels.push p_file.path_name.last %>
-    <% else %>
-        <% if !p_file.path_name.include? levels[-2] %>        
-            </ul>
-            <% levels.pop %>
-        <% end %>
-        <% levels.pop %>
-        <% levels.push p_file.path_name.last %>
-    <% end %>
-    <li><%= p_file.path_name.last %></li>
+    <ul id="browser" class="filetree">
     
-<% end %>
-</ul>
-</ul>
+        <% levels = @p_files.first.path_name.split('/')[0..-2] %>
+        
+        <%= form_tag :action => 'coevolution' do |f| %>
+        <% i = 0 %>
+        <% for p_file in @p_files %>
+            <% p_file.path_name = p_file.path_name.split '/' if p_file.path_name.class != Array %>
+            <% if (compare_tree_dir p_file.path_name, levels )  >= 0  %>
+                <% levels.push p_file.path_name.last if (compare_tree_dir p_file.path_name, levels )  == 1%>
+                <% if !@p_files[i + 1].nil? %>
+                    <% if (compare_tree_dir @p_files[i + 1].path_name.split('/'), levels) == 1 %>
+                        <li>
+                            <%= check_box_tag 'files[]', p_file.id%> <span class="folder"><%=p_file.path_name.last %></span>
+                            <ul>
+                        <% levels.push @p_files[i + 1].path_name.split('/').last %>
+                    <% else %>
+                        <li>
+                            <%= check_box_tag 'files[]', p_file.id%> <span class="file"><%=p_file.path_name.last %></span>
+                        </li>
+                        <% levels.pop %>
+                    <% end %>
+                <% else %>
+                        <li>
+                            <%= check_box_tag 'files[]', p_file.id%> <span class="file"><%=p_file.path_name.last %></span>
+                        </li>
+                <% end %>
+            <% else %>
+                    </ul>
+                </li>
+                <% levels.pop %>
+
+                <% redo %>
+
+            <% end %>
+            
+            <% i += 1 %>
+        <% end %>
+
+        <% while levels.length > 1 %>
+            </ul>
+            </li>
+            <% levels.pop %>    
+        <% end %>
+        
+    </ul>
+    
+    <%= submit_tag "Generate analysis" %>
+
+    <% end %>
 </div>
+
+
+
+
+
+
 
 <% @coevolution_files.each_key do |file_key| %>
     <h3><%= file_key.path_name %></h3>
@@ -50,7 +94,6 @@ $(document).ready( function() {
             <tr>
                 <td><%= co_file_key.path_name %></td>
                 <td><%= @coevolution_files[file_key][co_file_key] %></td>
-                
             </tr>
         <% end %>
     </table>
