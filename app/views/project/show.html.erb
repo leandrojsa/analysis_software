@@ -2,11 +2,20 @@
 			
 $(document).ready( function() {
                                                                                     
-$("#browser").treeview({
-    collapsed: true,
+    $("#browser").treeview({
+        collapsed: true,
+    });
+    
+    $('input#files_').click(function(){
+        op = $(this).is(':checked');
+        $(this).parent().find('input').each(function(){
+            $(this).attr('checked', op);
+        });
+    });
+
 });
-	
-});
+
+
 				
 </script>
 

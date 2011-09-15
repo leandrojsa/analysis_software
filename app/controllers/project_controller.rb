@@ -9,11 +9,11 @@ class ProjectController < ApplicationController
             end
             @coevolution_files = Hash.new
             total_commits_files = 0
-            @p_files.each{|file| 
+            @p_files.each do |file| 
                 total_commits_files += file.commit_files.count
                 for commit_file in file.commit_files
                     for co_file in commit_file.commit.commit_files
-                        if co_file.p_file_id != file.id
+                        if co_file.p_file_id != file.id and !@p_files.include? co_file.p_file
                             if @coevolution_files[co_file.p_file].nil?
                                 @coevolution_files.store co_file.p_file, 1
                             else
@@ -23,12 +23,12 @@ class ProjectController < ApplicationController
                     end 
                 end
                 
-            } 
-            @coevolution_files.each_key{|file_key|
+            end 
+            @coevolution_files.each_key do |file_key|
                 @coevolution_files[file_key] = @coevolution_files[file_key].to_f / total_commits_files.to_f
             
             
-            }
+            end
 
         end
     end
