@@ -2,6 +2,8 @@ source 'http://rubygems.org'
 
 gem 'rails'
 
+gem 'devise'
+
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
@@ -10,6 +12,10 @@ gem 'sqlite3-ruby', :require => 'sqlite3'
 gem 'mysql2', '0.2.7'
 
 gem 'jquery-rails'
+
+gem 'fastercsv'
+
+gem 'rails_admin', :git => 'git://github.com/sferik/rails_admin.git', :branch => 'rails-3.0'
 
 # Use unicorn as the web server
 # gem 'unicorn'

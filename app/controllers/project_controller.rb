@@ -1,6 +1,46 @@
 class ProjectController < ApplicationController
 
 
+    def index
+    
+        @projects = Project.all
+    
+    end
+
+
+    def mount_tree_dir dir_hash, print_array
+    
+    
+        dir_hash.each_key do |part_hash|
+    
+            if part_hash != 'id'
+                print_array.push '<li>'
+                if !dir_hash[part_hash]['id'].nil?
+                    print_array.push '<input id="files_" name="files[]" type="checkbox" value="' + dir_hash[part_hash]['id'].to_s + '" />'
+                end
+                
+                if !dir_hash[part_hash].nil?
+                
+                    if dir_hash[part_hash].include? 'id' and dir_hash[part_hash].length == 1
+
+                        print_array.push '<span class="file">' + part_hash + '</span>'
+                    else
+                        print_array.push '<span class="folder">' + part_hash + '</span>'
+                        print_array.push '<ul>'
+                        mount_tree_dir dir_hash[part_hash], print_array
+                        print_array.push '</ul>'
+                    end
+               end
+                print_array.push '</li>'
+            end
+            
+        end
+        
+        return print_array
+        
+    end
+
+
     def coevolution
         if params[:files]
             @p_files = Array.new  
@@ -43,7 +83,29 @@ class ProjectController < ApplicationController
                 @commits = Commit.find :all, :conditions => {:project_id => @project.id}, :order => "date ASC"
                 @commits_act = Array.new
                 
+                
+                
                 @p_files = PFile.find :all, :conditions => {:project_id => @project.id}, :order => "path_name ASC"
+                directories_tree = {}
+                
+                for p_file in @p_files
+                    path_name = p_file.path_name.split '/'
+                    path_name = path_name[1..-1]
+                    
+                    
+                        temp_dir = directories_tree
+                        for part in path_name
+                            if temp_dir[part].nil?
+                                temp_dir[part] = {'id' => p_file.id}
+                            end
+                            temp_dir = temp_dir[part]
+                        end
+                end
+                
+                @print_dir = []
+                
+                @print_dir = mount_tree_dir directories_tree, @print_dir
+
                 
                 @tags = Hash.new
                 @ignore_words = ['', '-', '+', '*', 'and', 'or', 'at', 'to', 'if', 'the', 'a', 'an', 'for', 'of', 'in', 'is', 'are', 'be', 'with', 'not', 'from', 'it', 'you', 'she', 'he', 'as', 'when', 'on', 'in', 'by', 'was', 'were', 'i', 'now', 'today', 'more', 'we', 'our', 'they', 'that', 'thoose', 'this', 'add', 'update', 'remove', 'string', 'added', 'removed', 'updated', 'updates', 'fix', 'fixed', 'fixes', 'file', 'integer', 'new', 'use', 'some', 'code', 'plugin', 'message', 'adding', 'so', 'new', 'make', 'take', 'do', 'does', 'did', 'but', 'however', 'function', 'dont', 'isnt', 'arent', 'wasnt', 'werent', 'no', 'will', 'should', 'can', 'could', 'ever', 'strings', 'about', 'only', 'also', 'which', 'work', 'better', 'worrer', 'all', 'one', 'up', 'down', 'get', 'set', 'have', 'has', 'other', 'files', 'check', 'list','out', 'move', 'moved', 'moving', 'change', 'because', 'changed', 'info', 'user', 'need', 'problem', 'case', 'made', 'like', 'liked', 'as', 'just', 'option', 'options', 'its', 'into', 'link', 'links', 'after', 'before'] 
@@ -77,14 +139,13 @@ class ProjectController < ApplicationController
             <tr>
                 <td><%= co_file_key.path_name %></td>
                 <td><%= @coevolution_files[file_key][co_file_key] %></td>
-                
             </tr>
         <% end %>
     </table>
     <br />
     <br />
 <% end %>
-=end
+
                 @coevolution_files = Hash.new
                 @project.p_files.each{|file| 
                     total_commits_file = file.commit_files.count
@@ -100,7 +161,8 @@ class ProjectController < ApplicationController
                             end
                         end 
                     end
-                }                
+                } 
+=end               
             end
         end
     end
