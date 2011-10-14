@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110924143855) do
+ActiveRecord::Schema.define(:version => 20110927185930) do
 
   create_table "commit_files", :force => true do |t|
     t.string   "action_type", :limit => 1
@@ -42,6 +42,9 @@ ActiveRecord::Schema.define(:version => 20110924143855) do
     t.string   "name"
     t.string   "repository"
     t.text     "description"
+    t.string   "image_file_name"
+    t.string   "image_content_type"
+    t.string   "image_file_size"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

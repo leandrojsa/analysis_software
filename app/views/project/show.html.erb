@@ -1,6 +1,24 @@
+<!--[if lt IE 9]><script language="javascript" type="text/javascript" src="/javascripts/jqplot/excanvas.js"></script><![endif]-->
+<script language="javascript" type="text/javascript" src="/javascripts/jqplot/jquery.jqplot.min.js"></script>
+<link rel="stylesheet" type="text/css" href="/stylesheets/jquery.jqplot.css" />
+<script type="text/javascript" src="/javascripts/jqplot/plugins/jqplot.highlighter.min.js"></script>
+<script type="text/javascript" src="/javascripts/jqplot/plugins/jqplot.cursor.min.js"></script>
+<script type="text/javascript" src="/javascripts/jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
+
 <script type="text/javascript"> 
 			
 $(document).ready( function() {
+
+    $('img#loading').hide();
+    
+    $("div.submit-button input").click(function(){
+        $(this).ajaxStart(function(){
+            $('img#loading').show();
+		});
+		$(this).ajaxStop(function(){
+            $('img#loading').hide();
+		});
+    });
                                                                                     
     $("#browser").treeview({
         collapsed: true,
@@ -12,6 +30,33 @@ $(document).ready( function() {
             $(this).attr('checked', op);
         });
     });
+    
+     var line1=[<% @project_activity.each_key do |date_key| %>['<%= date_key %>',<%= @project_activity[date_key] %>],<% end %>];
+  var plot1 = $.jqplot('chartdiv', [line1], {
+      title:'Number of commits X Time',
+      axes:{
+        xaxis:{
+          pad: 1.0,
+          renderer:$.jqplot.DateAxisRenderer,
+          tickOptions:{
+            formatString:'%b&nbsp;%y',
+          } 
+        },
+        yaxis:{
+          min: 0,
+          tickOptions:{
+            formatString:'%d'
+            }
+        }
+      },
+      highlighter: {
+        show: true,
+        sizeAdjust: 10.5
+      },
+      cursor: {
+        show: false
+      }
+  });
 
 });
 
@@ -19,11 +64,20 @@ $(document).ready( function() {
 				
 </script>
 
+
+
+
+
 <div class="content-header" >
     <h2><%= @project.name %></h2>
-    <p>Total commits: <%= @commits.count %></p>
+    <% if @project.image.url != "/images/original/missing.png" %>
+        <%= link_to image_tag(@project.image.url(:big)), @project %>
+    <% end %>
     <p><%= @project.description %></p>
 </div>
+
+<div id="chartdiv" style="height:400px;width:800px; "></div>
+<p>Total commits: <%= @commits.count %></p>
 
 <div class="content-left-bar">
 
@@ -32,7 +86,7 @@ $(document).ready( function() {
         <ul>
         <% @tags.each_key do |tag| %>
             <% if (@tags[tag] - @count_min_word).to_f / (@count_max_word - @count_min_word).to_f > 0.30 %>
-                <li style="font-size: <%= (50 * (@tags[tag] - @count_min_word)) / (@count_max_word - @count_min_word) %>px;"><%= tag %>(<%= @tags[tag] %>)</li>
+                <li style="font-size: <%= (35 * (@tags[tag] - @count_min_word)) / (@count_max_word - @count_min_word) %>px;"><%= tag %>(<%= @tags[tag] %>)</li>
             <% end %>
         <% end %>
         </ul>
@@ -43,18 +97,22 @@ $(document).ready( function() {
 <div class="content-right">
     <h2>Coevolution Analysis</h2>
     <div id="files-tree" style = "clear: both;">
+        <div id="graph-result"></div>
+        <img id="loading" alt="Carregando" title="Carregando" src="/images/loading.gif" style="z-index: 9999;" />
         <%= form_tag 'coevolution', :class => "analysis", :remote => true do |f| %>
-            <p><b>Begin commit date:</b><%=  select_date @commits.first.date, :use_month_numbers => true %><p>
-            <p><b>End commit date:</b><%=  select_date @commits.last.date, :use_month_numbers => true %><p>
+            <p><b>Begin commit date:</b><%=  select_date @commits.first.date, :use_month_numbers => true, :prefix => "begin_date" %><p>
+            <p><b>End commit date:</b><%=  select_date @commits.last.date, :use_month_numbers => true, :prefix => "end_date" %><p>
             <ul id="browser" class="filetree">
                 <% for line in @print_dir %>
                 <%= line.html_safe %>
                 <% end %>
             </ul>
-            <%= submit_tag "Generate analysis" %>
+            <div class="submit-button">
+                <%= submit_tag "Generate analysis" %>
+            </div>
         <% end %>
     </div>
-    <div id="graph-result"></div>
+    
 </div>
 
 

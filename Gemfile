@@ -15,6 +15,10 @@ gem 'jquery-rails'
 
 gem 'fastercsv'
 
+gem 'paperclip', '2.4.2'
+
+gem 'json', '1.4.0'
+
 gem 'rails_admin', :git => 'git://github.com/sferik/rails_admin.git', :branch => 'rails-3.0'
 
 # Use unicorn as the web server
@@ -39,4 +43,3 @@ gem 'nokogiri'
 # group :development, :test do
 #   gem 'webrat'
 # end
-

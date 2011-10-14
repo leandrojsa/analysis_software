@@ -52,17 +52,24 @@ class ProjectController < ApplicationController
             @p_files.each do |file| 
                 total_commits_files += file.commit_files.count
                 for commit_file in file.commit_files
-                    for co_file in commit_file.commit.commit_files
-                        if co_file.p_file_id != file.id and !@p_files.include? co_file.p_file
-                            if @coevolution_files[co_file.p_file].nil?
-                                @coevolution_files.store co_file.p_file, 1
-                            else
-                                @coevolution_files[co_file.p_file] += 1 
-                            end
+                    begin_date = DateTime.new(1000,01,01)
+                    end_date = DateTime.now
+                    if params[:begin_date] and params[:end_date]
+                        begin_date = DateTime.new(params[:begin_date]['year'].to_i, params[:begin_date]['month'].to_i,params[:begin_date]['day'].to_i)
+                        end_date = DateTime.new(params[:end_date]['year'].to_i, params[:end_date]['month'].to_i, params[:end_date]['day'].to_i)
+                    end
+                        if commit_file.commit.date >= begin_date and  commit_file.commit.date <= end_date
+                            for co_file in commit_file.commit.commit_files
+                                if co_file.p_file_id != file.id and !@p_files.include? co_file.p_file
+                                    if @coevolution_files[co_file.p_file].nil?
+                                        @coevolution_files.store co_file.p_file, 1
+                                    else
+                                        @coevolution_files[co_file.p_file] += 1 
+                                    end
+                                end
+                            end 
                         end
-                    end 
-                end
-                
+                    end
             end 
             @coevolution_files.each_key do |file_key|
                 @coevolution_files[file_key] = @coevolution_files[file_key].to_f / total_commits_files.to_f
@@ -111,7 +118,18 @@ class ProjectController < ApplicationController
                 @ignore_words = ['', '-', '+', '*', 'and', 'or', 'at', 'to', 'if', 'the', 'a', 'an', 'for', 'of', 'in', 'is', 'are', 'be', 'with', 'not', 'from', 'it', 'you', 'she', 'he', 'as', 'when', 'on', 'in', 'by', 'was', 'were', 'i', 'now', 'today', 'more', 'we', 'our', 'they', 'that', 'thoose', 'this', 'add', 'update', 'remove', 'string', 'added', 'removed', 'updated', 'updates', 'fix', 'fixed', 'fixes', 'file', 'integer', 'new', 'use', 'some', 'code', 'plugin', 'message', 'adding', 'so', 'new', 'make', 'take', 'do', 'does', 'did', 'but', 'however', 'function', 'dont', 'isnt', 'arent', 'wasnt', 'werent', 'no', 'will', 'should', 'can', 'could', 'ever', 'strings', 'about', 'only', 'also', 'which', 'work', 'better', 'worrer', 'all', 'one', 'up', 'down', 'get', 'set', 'have', 'has', 'other', 'files', 'check', 'list','out', 'move', 'moved', 'moving', 'change', 'because', 'changed', 'info', 'user', 'need', 'problem', 'case', 'made', 'like', 'liked', 'as', 'just', 'option', 'options', 'its', 'into', 'link', 'links', 'after', 'before'] 
                 @count_min_word = 1
                 @count_max_word = 1
+                
+                @project_activity = ActiveSupport::OrderedHash.new
+                
                 for commit in @commits
+                    
+                    # === activity project ===
+                    if @project_activity[commit.date.strftime "%b/%Y"].nil?
+                        @project_activity[commit.date.strftime("%b/%Y")] =  1
+                    else
+                        @project_activity[commit.date.strftime "%b/%Y"] += 1
+                    end
+                
                     # === cloud tags ===
                     words = commit.description.split " "
                     for word in words

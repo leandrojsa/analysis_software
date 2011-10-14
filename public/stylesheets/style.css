@@ -27,6 +27,7 @@ h1 {
 
 h2 {
 	font-size: 2.4em;
+	margin-bottom: 10px;
 }
 
 h3 {
@@ -384,21 +385,13 @@ a:hover {
 
 
 
-
-
-
-
-
-
-
-
-
 /* Project */
 
 .content-left-bar{
     
     width: 30%;
     float: left;
+    margin-right: 30px;
     
     
 
@@ -406,7 +399,7 @@ a:hover {
 
 .content-right{
     
-    width: 70%;
+    width: 66%;
     float: left;
 
 }
@@ -418,12 +411,24 @@ a:hover {
 
 
 }
-/*
-#files-tree{
+
+#files-tree input{
     float:left;
+    margin-left: 15px;
+    margin-top: 2px;
    
 }
 
+#cloud-tags {
+    margin-right: 10px;
+
+}
+
+#chartdiv{
+    margin-right: 30px;
+}
+
+/*
 #graph-result {
     float: left;
 }
