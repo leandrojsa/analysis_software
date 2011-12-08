@@ -39,6 +39,36 @@ class ProjectController < ApplicationController
         return print_array
         
     end
+    
+    def cloud_tags
+        @tags = Hash.new
+        @ignore_words = ['', '-', '+', '*', 'and', 'or', 'at', 'to', 'if', 'the', 'a', 'an', 'for', 'of', 'in', 'is', 'are', 'be', 'with', 'not', 'from', 'it', 'you', 'she', 'he', 'as', 'when', 'on', 'in', 'by', 'was', 'were', 'i', 'now', 'today', 'more', 'we', 'our', 'they', 'that', 'thoose', 'this', 'add', 'update', 'remove', 'string', 'added', 'removed', 'updated', 'updates', 'fix', 'fixed', 'fixes', 'file', 'integer', 'new', 'use', 'some', 'code', 'plugin', 'message', 'adding', 'so', 'new', 'make', 'take', 'do', 'does', 'did', 'but', 'however', 'function', 'dont', 'isnt', 'arent', 'wasnt', 'werent', 'no', 'will', 'should', 'can', 'could', 'ever', 'strings', 'about', 'only', 'also', 'which', 'work', 'better', 'worrer', 'all', 'one', 'up', 'down', 'get', 'set', 'have', 'has', 'other', 'files', 'check', 'list','out', 'move', 'moved', 'moving', 'change', 'because', 'changed', 'info', 'user', 'need', 'problem', 'case', 'made', 'like', 'liked', 'as', 'just', 'option', 'options', 'its', 'into', 'link', 'links', 'after', 'before',
+'improved'] 
+        @count_min_word = 1
+        @count_max_word = 1
+        if params[:begin_date] and params[:end_date] and params[:project_id]
+            begin_date = DateTime.new(params[:begin_date]['year'].to_i, params[:begin_date]['month'].to_i,params[:begin_date]['day'].to_i)
+            end_date = DateTime.new(params[:end_date]['year'].to_i, params[:end_date]['month'].to_i, params[:end_date]['day'].to_i)
+            commits = Commit.find :all, :conditions => {:project_id => params[:project_id], :date => begin_date..end_date}, :order => "date ASC"
+            for commit in commits
+                words = commit.description.split " "
+                for word in words
+                    word = word.gsub(/[.,:;!()\[\]"'\n]/, '').downcase
+                    if !@ignore_words.include? word
+                        if @tags[word].nil?
+                            @tags.store word, 1    
+                        else
+                            @tags[word] += 1
+                            if @tags[word] > @count_max_word
+                                @count_max_word = @tags[word]
+                            end
+                        end
+                    end
+                end
+            end
+            
+        end
+    end
 
 
     def coevolution
@@ -76,7 +106,7 @@ class ProjectController < ApplicationController
             
             
             end
-
+            
         end
     end
 
@@ -87,12 +117,12 @@ class ProjectController < ApplicationController
             @project = Project.find params[:id]            
 
             if !@project.nil?
-                @commits = Commit.find :all, :conditions => {:project_id => @project.id}, :order => "date ASC"
+                @commits = Commit.find :all, :conditions => {:project_id => @project.id}, :order => "date ASC"#, :limit => 5000
                 @commits_act = Array.new
                 
                 
                 
-                @p_files = PFile.find :all, :conditions => {:project_id => @project.id}, :order => "path_name ASC"
+                @p_files = PFile.find :all, :conditions => {:project_id => @project.id}, :order => "path_name ASC"#, :limit => 5000
                 directories_tree = {}
                 
                 for p_file in @p_files
@@ -101,11 +131,13 @@ class ProjectController < ApplicationController
                     
                     
                         temp_dir = directories_tree
-                        for part in path_name
-                            if temp_dir[part].nil?
-                                temp_dir[part] = {'id' => p_file.id}
+                        if !path_name.nil?
+                            for part in path_name
+                                if temp_dir[part].nil?
+                                    temp_dir[part] = {'id' => p_file.id}
+                                end
+                                temp_dir = temp_dir[part]
                             end
-                            temp_dir = temp_dir[part]
                         end
                 end
                 
@@ -146,41 +178,7 @@ class ProjectController < ApplicationController
                         end
                     end
                 end
-                
-                
-=begin
-
-<% @coevolution_files.each_key do |file_key| %>
-    <h3><%= file_key.path_name %></h3>
-    <table>
-        <% @coevolution_files[file_key].each_key do |co_file_key| %>
-            <tr>
-                <td><%= co_file_key.path_name %></td>
-                <td><%= @coevolution_files[file_key][co_file_key] %></td>
-            </tr>
-        <% end %>
-    </table>
-    <br />
-    <br />
-<% end %>
-
-                @coevolution_files = Hash.new
-                @project.p_files.each{|file| 
-                    total_commits_file = file.commit_files.count
-                    @coevolution_files.store file, {}
-                    for commit_file in file.commit_files
-                        for co_file in commit_file.commit.commit_files
-                            if co_file.p_file_id != file.id
-                                if @coevolution_files[file][co_file.p_file].nil?
-                                    @coevolution_files[file].store co_file.p_file, 1
-                                else
-                                    @coevolution_files[file][co_file.p_file] += 1 
-                                end
-                            end
-                        end 
-                    end
-                } 
-=end               
+                             
             end
         end
     end

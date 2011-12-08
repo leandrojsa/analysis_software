@@ -1,0 +1,1 @@
+$('#cloud-tags').html('<h2>Cloud Tags</h2><ul><% @tags.each_key do |tag| %><% if (@tags[tag] - @count_min_word).to_f / (@count_max_word - @count_min_word).to_f > 0.30 %><li style="font-size: <%= (35 * (@tags[tag] - @count_min_word)) / (@count_max_word - @count_min_word) %>px;"><%= tag %>(<%= @tags[tag] %>)</li><% end %><% end %></ul><br /><br /><br /> <br />');

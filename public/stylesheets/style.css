@@ -408,7 +408,12 @@ a:hover {
     margin-left: 10px;
     float: left;
     list-style-type: none;
+    margin-top: 10px;
 
+}
+
+#cloud-tags ul{
+    margin-bottom: 10px;
 
 }
 
@@ -421,6 +426,9 @@ a:hover {
 
 #cloud-tags {
     margin-right: 10px;
+    margin-bottom: 10px;
+    float: left;
+    
 
 }
 
@@ -435,3 +443,8 @@ a:hover {
 */
 
 /* End Project */
+
+
+div.tipsy {
+  padding-top: 15px;
+}

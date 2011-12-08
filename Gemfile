@@ -17,7 +17,7 @@ gem 'fastercsv'
 
 gem 'paperclip', '2.4.2'
 
-gem 'json', '1.4.0'
+gem 'json', '1.4.6'
 
 gem 'rails_admin', :git => 'git://github.com/sferik/rails_admin.git', :branch => 'rails-3.0'
 

@@ -37,11 +37,12 @@ Released   : 20110306
 		</div>
 	</div>
 	<div id="menu">
+	        <% current_page = request.request_uri.split '/' %>
 		<ul>
-			<li class="current_page_item"><%= link_to "Home", "/" %></li>
-			<li><a href="#">About</a></li>
-			<li><%= link_to "Projects", "/project" %></li>
-			<li><a href="#">Contact</a></li>
+			<li <% if current_page[1] == nil %> class="current_page_item"<%end%>><%= link_to "Home", "/" %></li>
+			<li <% if current_page[1] == 'about' %> class="current_page_item"<%end%> ><a href="#">About</a></li>
+			<li <% if current_page[1] == 'project' %> class="current_page_item"<%end%> ><%= link_to "Projects", "/project" %></li>
+			<li <% if current_page[1] == 'contact' %> class="current_page_item"<%end%>><a href="#">Contact</a></li>
 		</ul>
 	</div>
 	<!-- end #header -->

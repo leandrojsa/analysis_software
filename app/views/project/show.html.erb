@@ -10,6 +10,7 @@
 $(document).ready( function() {
 
     $('img#loading').hide();
+    $('img#loading-cloud').hide();
     
     $("div.submit-button input").click(function(){
         $(this).ajaxStart(function(){
@@ -17,6 +18,15 @@ $(document).ready( function() {
 		});
 		$(this).ajaxStop(function(){
             $('img#loading').hide();
+		});
+    });
+    
+    $("#cloud-form input.cloud-tag").click(function(){
+        $(this).ajaxStart(function(){
+            $('img#loading-cloud').show();
+		});
+		$(this).ajaxStop(function(){
+		    $('img#loading-cloud').hide();
 		});
     });
                                                                                     
@@ -33,7 +43,7 @@ $(document).ready( function() {
     
      var line1=[<% @project_activity.each_key do |date_key| %>['<%= date_key %>',<%= @project_activity[date_key] %>],<% end %>];
   var plot1 = $.jqplot('chartdiv', [line1], {
-      title:'Number of commits X Time',
+      title:'Time(x) X Number of commits(y)',
       axes:{
         xaxis:{
           pad: 1.0,
@@ -80,7 +90,7 @@ $(document).ready( function() {
 <p>Total commits: <%= @commits.count %></p>
 
 <div class="content-left-bar">
-
+    
     <div id="cloud-tags" >
         <h2>Cloud Tags</h2>
         <ul>
@@ -90,7 +100,21 @@ $(document).ready( function() {
             <% end %>
         <% end %>
         </ul>
+        <br />
+        <br />
+        <br />
+        <br />
     </div>
+    <img id="loading-cloud" alt="Carregando" title="Carregando" src="/images/loading.gif" style="z-index: 9999;" />
+    <div id="cloud-form">
+        <%= form_tag 'cloud_tags', :class => "analysis", :remote => true do |f| %>
+        <%= hidden_field_tag 'project_id', @project.id %>
+        <p><b>Begin commit date:</b><%=  select_date @commits.first.date, :use_month_numbers => true, :prefix => "begin_date", :start_year => @commits.first.date.year, :end_year => @commits.last.date.year %></p>
+            <p><b>End commit date:</b><%=  select_date @commits.last.date, :use_month_numbers => true, :prefix => "end_date", :start_year => @commits.first.date.year, :end_year => @commits.last.date.year %></p>
+            <%= submit_tag "Filter", :class => 'cloud-tag'%>
+        <% end %>
+    </div>
+    
     
 </div>
 
@@ -100,8 +124,8 @@ $(document).ready( function() {
         <div id="graph-result"></div>
         <img id="loading" alt="Carregando" title="Carregando" src="/images/loading.gif" style="z-index: 9999;" />
         <%= form_tag 'coevolution', :class => "analysis", :remote => true do |f| %>
-            <p><b>Begin commit date:</b><%=  select_date @commits.first.date, :use_month_numbers => true, :prefix => "begin_date" %><p>
-            <p><b>End commit date:</b><%=  select_date @commits.last.date, :use_month_numbers => true, :prefix => "end_date" %><p>
+            <p><b>Begin commit date:</b><%=  select_date @commits.first.date, :use_month_numbers => true, :prefix => "begin_date", :start_year => @commits.first.date.year, :end_year => @commits.last.date.year %></p>
+            <p><b>End commit date:</b><%=  select_date @commits.last.date, :use_month_numbers => true, :prefix => "end_date", :start_year => @commits.first.date.year, :end_year => @commits.last.date.year %></p>
             <ul id="browser" class="filetree">
                 <% for line in @print_dir %>
                 <%= line.html_safe %>
