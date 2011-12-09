@@ -73,22 +73,23 @@ class ProjectController < ApplicationController
 
     def coevolution
         if params[:files]
+            begin_date = DateTime.new(1000,01,01)
+            end_date = DateTime.now
+            if params[:begin_date] and params[:end_date]
+               begin_date = DateTime.new(params[:begin_date]['year'].to_i, params[:begin_date]['month'].to_i,params[:begin_date]['day'].to_i)
+               end_date = DateTime.new(params[:end_date]['year'].to_i, params[:end_date]['month'].to_i, params[:end_date]['day'].to_i)
+            end
             @p_files = Array.new  
             for p_files_id in params[:files]
                 @p_files.push PFile.find p_files_id
             end
             @coevolution_files = Hash.new
-            total_commits_files = 0
-            @p_files.each do |file| 
-                total_commits_files += file.commit_files.count
+            total_commits_files = 0.0
+            @p_files.each do |file|
+                #total_commits_files += file.commit_files.count
                 for commit_file in file.commit_files
-                    begin_date = DateTime.new(1000,01,01)
-                    end_date = DateTime.now
-                    if params[:begin_date] and params[:end_date]
-                        begin_date = DateTime.new(params[:begin_date]['year'].to_i, params[:begin_date]['month'].to_i,params[:begin_date]['day'].to_i)
-                        end_date = DateTime.new(params[:end_date]['year'].to_i, params[:end_date]['month'].to_i, params[:end_date]['day'].to_i)
-                    end
                         if commit_file.commit.date >= begin_date and  commit_file.commit.date <= end_date
+                            total_commits_files += 1
                             for co_file in commit_file.commit.commit_files
                                 if co_file.p_file_id != file.id and !@p_files.include? co_file.p_file
                                     if @coevolution_files[co_file.p_file].nil?
@@ -99,12 +100,10 @@ class ProjectController < ApplicationController
                                 end
                             end 
                         end
-                    end
+                 end
             end 
             @coevolution_files.each_key do |file_key|
-                @coevolution_files[file_key] = @coevolution_files[file_key].to_f / total_commits_files.to_f
-            
-            
+                @coevolution_files[file_key] = @coevolution_files[file_key].to_f / total_commits_files
             end
             
         end
